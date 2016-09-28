@@ -34,6 +34,7 @@ setuptools.setup(
         packages=['email_normalizer'],
         install_requires=requirements_from_file('requirements.txt'),
         tests_require=requirements_from_file('test-requirements.txt'),
+        test_suite='tests',
         license=open('LICENSE').read(),
         classifiers=classifiers,
         package_data={'': ['LICENSE', 'README.md']},
