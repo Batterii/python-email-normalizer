@@ -3,6 +3,7 @@ import sys
 import mock
 
 from email_normalizer import normalize, _get_mx_servers, _load_domains
+from email_normalizer import BaseNormalizer
 
 
 class NormalizerTest(unittest.TestCase):
@@ -25,6 +26,14 @@ class NormalizerTest(unittest.TestCase):
 
     def test_default(self):
         self.assertEqual(normalize('test@domain.com', resolve=False), 'test@domain.com')
+
+    def test_override_default_normalizer(self):
+        class MyNormalizer(BaseNormalizer):
+            @classmethod
+            def normalize(cls, local_part, domain):
+                local_part = local_part.split('+')[0]
+                return '{0}@{1}'.format(local_part, domain)
+        self.assertEqual(normalize('foo+123@bar.com', resolve=False, default_normalizer=MyNormalizer), 'foo@bar.com')
 
     def test_duplicated_domains(self):
         with mock.patch('email_normalizer.google.GoogleNormalizer.domains', ['samedomain.com']), \

@@ -52,7 +52,7 @@ def _get_mx_servers(domain):
         return []
 
 
-def _get_normalizer(domain, resolve):
+def _get_normalizer(domain, resolve, default_normalizer):
     if domain in _domain_normalizers:
         return _domain_normalizers[domain]
 
@@ -62,13 +62,13 @@ def _get_normalizer(domain, resolve):
                 if mx.endswith(service_domain):
                     return normalizer
 
-    return DefaultNormalizer
+    return default_normalizer or DefaultNormalizer
 
 
-def normalize(email, resolve=True):
+def normalize(email, resolve=True, default_normalizer=None):
     local_part, domain = email.lower().split('@')
 
-    return _get_normalizer(domain, resolve).normalize(local_part, domain)
+    return _get_normalizer(domain, resolve, default_normalizer).normalize(local_part, domain)
 
 
 _load_domains()
