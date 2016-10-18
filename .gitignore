@@ -21,3 +21,5 @@ env
 .DS_Store
 dist
 *.egg-info
+.eggs/
+
