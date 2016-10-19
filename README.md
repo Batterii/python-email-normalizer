@@ -1,6 +1,8 @@
 Python email normalizer
 -----------------------
 
+Originally forked from: [python-email-normalizer](https://github.com/r-dmv/python-email-normalizer). Adds a few extra utilities.
+
 ## Usage
 
 ```python
