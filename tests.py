@@ -2,7 +2,7 @@ import unittest
 import sys
 import mock
 
-from email_normalizer import normalize, _get_mx_servers, _load_domains
+from email_normalizer import normalize, _get_mx_servers, _load_normalizers, register_normalizer, unregister_normalizer
 from email_normalizer import BaseNormalizer
 
 
@@ -38,7 +38,23 @@ class NormalizerTest(unittest.TestCase):
     def test_duplicated_domains(self):
         with mock.patch('email_normalizer.google.GoogleNormalizer.domains', ['samedomain.com']), \
                 mock.patch('email_normalizer.yandex.YandexNormalizer.domains', ['samedomain.com']):
-            self.assertRaises(ValueError, _load_domains)
+            self.assertRaises(ValueError, _load_normalizers)
+
+    def test_register_unregister(self):
+        class FooBarNormalizer(BaseNormalizer):
+            domains = ['foobar.com']
+            @classmethod
+            def normalize(cls, local_part, domain):
+                local_part = local_part.split('--')[0]
+                return '{0}@{1}'.format(local_part, domain)
+
+        self.assertEqual(normalize('hello--world@foobar.com', resolve=False), 'hello--world@foobar.com')
+
+        register_normalizer(FooBarNormalizer)
+        self.assertEqual(normalize('hello--world@foobar.com', resolve=False), 'hello@foobar.com')
+
+        unregister_normalizer(FooBarNormalizer)
+        self.assertEqual(normalize('hello--world@foobar.com', resolve=False), 'hello--world@foobar.com')
 
 
 class YandexNormalizerTests(unittest.TestCase):
@@ -108,4 +124,3 @@ if __name__ == '__main__':
 
     result = unittest.TextTestRunner().run(suite)
     sys.exit(not result.wasSuccessful())
-
